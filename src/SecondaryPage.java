@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 public class SecondaryPage extends JFrame{
     public JPanel topPanel;
-    public static JPanel middlePanel;
+    public JPanel middlePanel;
     public JPanel bottomPanel;
     public JPanel mainPanel;
     public JScrollPane scrollPane;
@@ -17,17 +17,18 @@ public class SecondaryPage extends JFrame{
     public int width = 800;
     public int height = 500;
 
-    SecondaryPage() {
+    SecondaryPage(ArrayList<String> duplicates) {
         super("Duplicate Finder");
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setVisible(true);
         this.setBounds(dimension.width/2-width/2,dimension.height/2-height/2, width, height);
         this.setPreferredSize(new Dimension(width, height));
-        createPanel();
+        CreatePanel();
+        CreateListOfDuplicates(duplicates);
     }
 
-    private void createPanel() {
+    private void CreatePanel() {
         container = this.getContentPane();
 
         topPanel = new JPanel();
@@ -66,35 +67,7 @@ public class SecondaryPage extends JFrame{
         container.add(mainPanel);
     }
 
-    public static void main(String[] args) {
-        ArrayList<String> names = new ArrayList<>();
-        names.add("File 1//Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 2/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 3/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 4/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 5/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 6/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 7/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 8/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 9/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 10/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 11/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 12/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 13/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 14/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 15/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 16/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 17/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 18/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 19/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 20/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 21/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 21/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 22/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        SecondaryPage GP = new SecondaryPage();
-        CreateListOfDuplicates(names);
-    }
-    public static void CreateListOfDuplicates(ArrayList<String> duplicates) {
+    public void CreateListOfDuplicates(ArrayList<String> duplicates) {
         HashMap<String, JCheckBox> map = new HashMap<>();
         /* Создание чекбоксов с именами копий для выбора тех, которые нужно удалить */
         //ArrayList<JCheckBox> listOfSelectedDuplicates = new ArrayList<>();
