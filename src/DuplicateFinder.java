@@ -1,184 +1,174 @@
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Scanner;
-
+import java.util.Objects;
 
 public class DuplicateFinder {
+    public static MainPage MP;
+    public static SecondaryPage SP;
+    static ArrayList<ArrayList<FileObject>> listOfAllDuplicates;
+    static int size = 0;
+
     public static void main(String[] args) {
-        ArrayList<String> names = new ArrayList<>();
-        names.add("File 1//Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 2/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 3/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 4/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 5/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 6/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 7/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 8/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 9/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 10/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 11/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 12/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 13/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 14/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 15/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 16/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 17/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 18/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 19/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 20/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 21/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 21/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
-        names.add("File 22/Users/kkattrrinnn/Documents/ОПП III II/Сетевое программирование/pdf");
+        listOfAllDuplicates = new ArrayList<>();
+        MP = new MainPage();
+    }
 
-
-        //MainPage MP = new MainPage();
-        //SecondaryPage SP = new SecondaryPage(names);
-
-        Scanner in = new Scanner(System.in);
-        ArrayList<FileObject> files = new ArrayList<>();
-        ArrayList<FileObject> temp_files = new ArrayList<>();
-        ArrayList<FileObject> files_to_delete = new ArrayList<>();
-        ArrayList<Long> used_sizes = new ArrayList<>();
-        Long size;
-        String name_dir;
-        System.out.println("Введите директорию в формате C:\\Program Files: ");
-        name_dir = in.nextLine();
-        File dir1 = new File(name_dir);
-
-        for (File item : dir1.listFiles()) {
-            Search_all_files(item, files);
-        }
-
-        Sort_size(files);
-
-        for (int i=0; i<files.size(); i++) {
-            temp_files.clear();
-
-            size = files.get(i).size.longValue();
-
-            if (used_sizes.contains(size)) {
-                continue;
-            } else {
-                used_sizes.add(size);
-
-                temp_files.add(files.get(i));
-
-                for (int j=i+1; j<files.size(); j++) {
-                    if (files.get(j).size.longValue()>size) {
-                        break;
-                    } else if (files.get(j).size.longValue() == size){
-                        temp_files.add(files.get(j));
+    // выполнение программы после нажатия на кнопку "поиск"
+    public static void PerformTheSearchFunction() {
+        String fileName = MainPage.GetFileName();
+        String directoryName = MainPage.GetDirectoryName();
+        ArrayList<FileObject> tempFiles = new ArrayList<>();
+        ArrayList<Long> usedSizesOfFiles = new ArrayList<>();
+        Long sizeOfFile;
+        if (fileName.equals("")) {
+            File dir = new File(directoryName);
+            ArrayList<FileObject> files = new ArrayList<>();
+            for (File item : Objects.requireNonNull(dir.listFiles())) {
+                DepthFirstSearch(item, files);
+            }
+            SortFilesBySize(files);                         // сортировка найденных файлов по размеру
+            // группировка файлов по размеру с дальнейшим поиском дубликатов в каждой группе
+            for (int i = 0; i < files.size(); i++) {            // реализация группировки
+                tempFiles.clear();
+                sizeOfFile = files.get(i).size;
+                if (usedSizesOfFiles.contains(sizeOfFile)) {
+                    continue;
+                } else {
+                    usedSizesOfFiles.add(sizeOfFile);           // файлы одного размера помещаются во временный список
+                    tempFiles.add(files.get(i));
+                    for (int j = i + 1; j < files.size(); j++) {
+                        if (files.get(j).size > sizeOfFile) {
+                            break;
+                        } else if (files.get(j).size.longValue() == sizeOfFile){
+                            tempFiles.add(files.get(j));
+                        }
+                    }
+                    if (tempFiles.size()>1) {
+                        SearchForDuplicates(tempFiles);
                     }
                 }
-
-                if (temp_files.size()>1) {
-                    Search_duplicates(temp_files, files_to_delete);
-                    System.out.println();
+            }
+        } else {
+            FileObject originalFile = new FileObject(fileName);
+            if (!originalFile.exists()) {
+                MP.secondLineOfTopTable.setText("  Проверьте введённые данные");
+            } else {
+                Long originalFileSize = originalFile.size;
+                File dir = new File(directoryName);
+                ArrayList<FileObject> files = new ArrayList<>();
+                for (File item : Objects.requireNonNull(dir.listFiles())) {
+                    DepthFirstSearch(item, files);
+                }
+                SortFilesBySize(files);                         // сортировка найденных файлов по размеру
+                tempFiles.clear();
+                for (int i = 0; i < files.size(); i++) {            // поиск файлов с тем же размером
+                    sizeOfFile = files.get(i).size;
+                    if (sizeOfFile.equals(originalFileSize)) {
+                        tempFiles.add(files.get(i));
+                    }
+                }
+                if (tempFiles.size() > 0) {
+                    SearchForDuplicates(tempFiles, originalFile.getHash());
                 }
             }
         }
-
-        if (files_to_delete.size()>0) {
-            System.out.println(files_to_delete);
-            for (int i=0; i<files_to_delete.size(); i++) {
-                files_to_delete.get(i).delete();
-            }
-            System.out.println("Копии были успешно удалены. ");
-        } else {
-            System.out.println("Файлы для удаления не найдены");
+        if (listOfAllDuplicates.size() > 0) {
+            MP.dispose();
+            SP = new SecondaryPage(listOfAllDuplicates, size);
         }
     }
-//<orderEntry type="library" name="commons-codec-1.15" level="project" />
-    public static void Search_all_files (File dir, ArrayList<FileObject> array_files) {
 
+///Users/kkattrrinnn/Documents/Studies(III:II)/Производственная практика/Dogovor_na_praktiku_2022 — копия 2.docx
+// создание списка всех файлов в начальном каталоге (поиск в глубину)
+    public static void DepthFirstSearch(File object, ArrayList<FileObject> listOfFiles) {
         try {
-            if (dir.isFile()) {
-                array_files.add(new FileObject(dir.toString()));
-            } else if (dir.isDirectory()) {
-                for (File ob : dir.listFiles()) {
+            if (object.isFile()) {
+                listOfFiles.add(new FileObject(object.toString()));
+            } else if (object.isDirectory()) {
+                for (File ob : Objects.requireNonNull(object.listFiles())) {
                     if (ob.isHidden()) {
                         continue;
                     } else {
-                        Search_all_files(ob, array_files);
+                        DepthFirstSearch(ob, listOfFiles);
                     }
                 }
             }
         } catch (NullPointerException e) {
-            System.out.print(' ');
+            e.printStackTrace();
         }
     }
 
-    public static void Sort_size(ArrayList<FileObject> Files) {
-        int index_max;
-        int n = Files.size()-1;
+// Сортировка файлов по размеру для дальнейшей группировки
+    public static void SortFilesBySize(ArrayList<FileObject> listOfFiles) {
         FileObject temp_file;
-
-        for (int i=n; i>0; i--) {
+        int index_max;
+        int n = listOfFiles.size()-1;
+        for (int i = n; i > 0; i--) {
             index_max = 0;
-
-            for (int j=1; j<=i; j++) {
-                if (Files.get(j).size>Files.get(index_max).size) {
+            for (int j = 1; j <= i; j++) {
+                if (listOfFiles.get(j).size>listOfFiles.get(index_max).size) {
                     index_max = j;
                 }
-                temp_file = Files.get(i);
-                Files.set(i, Files.get(index_max));
-                Files.set(index_max, temp_file);
+                temp_file = listOfFiles.get(i);                     // перестановка элементов
+                listOfFiles.set(i, listOfFiles.get(index_max));
+                listOfFiles.set(index_max, temp_file);
             }
         }
     }
 
-    public static void Search_duplicates(ArrayList<FileObject> array_files, ArrayList<FileObject> files_to_del) {
-        Scanner in2 = new Scanner(System.in);
-        int n = array_files.size();
-        int answer;
-        int original;
+// Поиск дубликатов в списке файлов
+    public static void SearchForDuplicates(ArrayList<FileObject> listOfFiles, String originalFileHash) {
+        int n = listOfFiles.size();
         ArrayList<FileObject> duplicates = new ArrayList<>();
-        ArrayList<FileObject> used_files = new ArrayList<>();
+        ArrayList<FileObject> usedFiles = new ArrayList<>();
         String hash;
         String hash2;
+        if (originalFileHash.equals("")) {
+            for (int i = 0; i < n; i++) {
+                if (usedFiles.contains(listOfFiles.get(i))) {
+                    continue;
+                } else {
+                    duplicates.clear();
+                    hash = listOfFiles.get(i).getHash();
+                    duplicates.add(listOfFiles.get(i));
+                    usedFiles.add(listOfFiles.get(i));
 
-        for (int i=0; i<n; i++) {
-            if (files_to_del.contains(array_files.get(i)) | used_files.contains(array_files.get(i))) {
-                continue;
-            } else {
-                duplicates.clear();
-                hash = array_files.get(i).get_hash();
-                duplicates.add(array_files.get(i));
-                used_files.add(array_files.get(i));
-
-                for (int j = i + 1; j < n; j++) {
-                    hash2 = array_files.get(j).get_hash();
-                    if (hash2.equals(hash)) {
-                        duplicates.add(array_files.get(j));
-                        used_files.add(array_files.get(j));
-                    }
-                }
-
-                if (duplicates.size()>1) {
-                    System.out.println("Найденные дубликаты: ");
-                    for (int k=0; k<duplicates.size(); k++) {
-                        System.out.println((k+1) + ": " +duplicates.get(k) + "---" + duplicates.get(k).get_hash());
-
-                    }
-                    System.out.print("Для удаления копий введите 1, иначе  - 0: ");
-                    answer = in2.nextInt();
-                    if (answer == 1) {
-                        System.out.print("Введите номер файла, который следует оставить: ");
-                        original = in2.nextInt()-1;
-                        for (int k = 0; k < duplicates.size(); k++) {
-                            if (k != original) {
-                                files_to_del.add(duplicates.get(k));
-                            }
+                    for (int j = i + 1; j < n; j++) {
+                        hash2 = listOfFiles.get(j).getHash();
+                        if (hash2.equals(hash)) {
+                            duplicates.add(listOfFiles.get(j));
+                            usedFiles.add(listOfFiles.get(j));
                         }
                     }
+                    if (duplicates.size() > 1) {
+                        listOfAllDuplicates.add(duplicates);
+                        size += duplicates.size();
+                    }
                 }
+            }
+        } else {
+            hash = originalFileHash;
+            duplicates.clear();
+            for (int i = 0; i < n; i++) {
+                hash2 = listOfFiles.get(i).getHash();
+                if (hash.equals(hash2)) {
+                    duplicates.add(listOfFiles.get(i));
+                }
+            }
+            if (duplicates.size() > 0) {
+                listOfAllDuplicates.add(duplicates);
+                size += duplicates.size();
             }
         }
     }
 
-    public static boolean Search() {
-        return false;
+    public static void SearchForDuplicates(ArrayList<FileObject> listOfFiles) {
+        SearchForDuplicates(listOfFiles, "");
+    }
+
+    public static void DeleteFiles(ArrayList<FileObject> filesToDelete) {
+        for (File ob : filesToDelete) {
+            ob.delete();
+        }
     }
 }

@@ -1,14 +1,16 @@
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 
 public class MainPage extends JFrame{
     JPanel mainPanel;
     JPanel firstButtonPanel;
     JPanel secondButtonPanel;
-    JLabel firstLine;
-    JTextField originalFileName;
+    JLabel firstLineOfTopLabel;
+    JLabel secondLineOfTopTable;
+    static JTextField originalFileName;
     JLabel secondLine;
-    JTextField searchDirectoryName;
+    static JTextField searchDirectoryName;
     JButton searchButton;
     JButton exitButton;
     Container container;
@@ -33,17 +35,20 @@ public class MainPage extends JFrame{
 
         mainPanel = new JPanel();
         mainPanel.setLayout(new GridLayout(8, 1));
-        mainPanel.add(new JLabel());                            // визуальный отступ
 
-        firstLine = new JLabel("    Введите полный путь к оригинальному файлу:");
-        firstLine.setFont(BigFontCS);
-        mainPanel.add(firstLine);
+        firstLineOfTopLabel = new JLabel("    Введите полный путь к оригинальному файлу, указывая его расширение");
+        firstLineOfTopLabel.setFont(BigFontCS);
+        mainPanel.add(firstLineOfTopLabel);
+
+        secondLineOfTopTable = new JLabel("    Или оставьте поле пустым, чтобы выполнить поиск всех дубликатов");
+        secondLineOfTopTable.setFont(BigFontCS);
+        mainPanel.add(secondLineOfTopTable);
 
         originalFileName = new JTextField();
         originalFileName.setFont(BigFontCS);
         mainPanel.add(originalFileName);
 //--------------------------------------------------------------------------------
-        secondLine = new JLabel("   Введите полный путь к директории, в которой необходимо провести поиск:");
+        secondLine = new JLabel("    Введите полный путь к директории, в которой необходимо провести поиск");
         secondLine.setFont(BigFontCS);
         mainPanel.add(secondLine);
 
@@ -59,11 +64,7 @@ public class MainPage extends JFrame{
         searchButton = new JButton("Поиск");
         searchButton.setVisible(true);
         searchButton.addActionListener(e -> {        // обработка нажатия
-            this.removeAll();                         // очистка панели
-            this.repaint();
-            this.revalidate();
-            this.dispose();
-            System.exit(0);
+            DuplicateFinder.PerformTheSearchFunction();
         });
         firstButtonPanel.add(searchButton);
         firstButtonPanel.add(new JLabel());
@@ -94,15 +95,13 @@ public class MainPage extends JFrame{
         this.repaint();
     }
 
-    public String GetFileName() {
-        String data = new String();
+    public static String GetFileName() {
         if (originalFileName.getText() != null || originalFileName.getText().equals("")) {
             return originalFileName.getText();
         } else return "";
     }
 
-    public String GetDirectoryName() {
-        String data = new String();
+    public static String GetDirectoryName() {
         if (searchDirectoryName.getText() != null || searchDirectoryName.getText().equals("")) {
             return searchDirectoryName.getText();
         } else return "";
